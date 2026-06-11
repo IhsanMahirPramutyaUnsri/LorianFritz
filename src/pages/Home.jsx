@@ -4,18 +4,30 @@ import BookCard from '../components/BookCard';
 
 const ITEMS_PER_PAGE = 8;
 
+const authors = [...new Set(books.map(b => b.author))].sort();
+
 export default function Home() {
   const [search, setSearch] = useState('');
   const [selectedGenres, setSelectedGenres] = useState([]);
+  const [selectedAuthors, setSelectedAuthors] = useState([]);
   const [priceRange, setPriceRange] = useState([0, 300000]);
   const [minRating, setMinRating] = useState(0);
+  const [inStockOnly, setInStockOnly] = useState(false);
   const [sortBy, setSortBy] = useState('newest');
   const [page, setPage] = useState(1);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [authorSearchQ, setAuthorSearchQ] = useState('');
 
   const toggleGenre = (genre) => {
     setSelectedGenres(prev =>
       prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre]
+    );
+    setPage(1);
+  };
+
+  const toggleAuthor = (author) => {
+    setSelectedAuthors(prev =>
+      prev.includes(author) ? prev.filter(a => a !== author) : [...prev, author]
     );
     setPage(1);
   };
@@ -25,19 +37,22 @@ export default function Home() {
       const q = search.toLowerCase();
       const matchSearch = !q || b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q);
       const matchGenre = selectedGenres.length === 0 || selectedGenres.includes(b.genre);
+      const matchAuthor = selectedAuthors.length === 0 || selectedAuthors.includes(b.author);
       const matchPrice = b.price >= priceRange[0] && b.price <= priceRange[1];
       const matchRating = b.rating >= minRating;
-      return matchSearch && matchGenre && matchPrice && matchRating;
+      const matchStock = !inStockOnly || b.stock > 0;
+      return matchSearch && matchGenre && matchAuthor && matchPrice && matchRating && matchStock;
     });
 
     switch (sortBy) {
       case 'price-asc': result = [...result].sort((a, b) => a.price - b.price); break;
       case 'price-desc': result = [...result].sort((a, b) => b.price - a.price); break;
       case 'rating': result = [...result].sort((a, b) => b.rating - a.rating); break;
+      case 'title-az': result = [...result].sort((a, b) => a.title.localeCompare(b.title)); break;
       case 'newest': result = [...result].sort((a, b) => b.id - a.id); break;
     }
     return result;
-  }, [search, selectedGenres, priceRange, minRating, sortBy]);
+  }, [search, selectedGenres, selectedAuthors, priceRange, minRating, inStockOnly, sortBy]);
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
@@ -47,11 +62,24 @@ export default function Home() {
 
   const clearFilters = () => {
     setSelectedGenres([]);
+    setSelectedAuthors([]);
     setPriceRange([0, 300000]);
     setMinRating(0);
+    setInStockOnly(false);
     setSearch('');
     setPage(1);
   };
+
+  const activeFilterCount =
+    selectedGenres.length +
+    selectedAuthors.length +
+    (minRating > 0 ? 1 : 0) +
+    (inStockOnly ? 1 : 0) +
+    (priceRange[1] < 300000 ? 1 : 0);
+
+  const filteredAuthors = authors.filter(a =>
+    !authorSearchQ || a.toLowerCase().includes(authorSearchQ.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -60,7 +88,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Discover Your Next Great Read</h1>
           <p className="text-white/70 text-lg mb-8 max-w-xl mx-auto">
-            Explore thousands of books across every genre, from timeless classics to modern bestsellers.
+            Explore books across every genre, from timeless classics to modern bestsellers.
           </p>
           <div className="max-w-2xl mx-auto relative">
             <input
@@ -68,8 +96,7 @@ export default function Home() {
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(1); }}
               placeholder="Search by title or author..."
-              className="w-full px-5 py-4 pr-12 rounded-xl text-gray-800 text-base shadow-lg focus:outline-none focus:ring-2"
-              style={{ '--tw-ring-color': '#0A2342' }}
+              className="w-full px-5 py-4 pr-12 rounded-xl text-gray-800 text-base shadow-lg focus:outline-none"
             />
             <svg className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -89,21 +116,40 @@ export default function Home() {
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
             </svg>
-            Filters {(selectedGenres.length > 0 || minRating > 0) && `(${selectedGenres.length + (minRating > 0 ? 1 : 0)})`}
+            Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
           </button>
         </div>
 
         <div className="flex gap-8">
           {/* Sidebar */}
           <aside className={`${sidebarOpen ? 'block' : 'hidden'} md:block w-full md:w-64 flex-shrink-0`}>
-            <div className="bg-white rounded-xl border border-gray-200 p-5 sticky top-24">
-              <div className="flex items-center justify-between mb-4">
+            <div className="bg-white rounded-xl border border-gray-200 p-5 sticky top-24 space-y-6">
+              <div className="flex items-center justify-between">
                 <h2 className="font-bold text-base" style={{ color: '#0A2342' }}>Filters</h2>
-                <button onClick={clearFilters} className="text-xs text-gray-400 hover:text-gray-600 underline">Clear all</button>
+                {activeFilterCount > 0 && (
+                  <button onClick={clearFilters} className="text-xs text-gray-400 hover:text-gray-600 underline">
+                    Clear all ({activeFilterCount})
+                  </button>
+                )}
+              </div>
+
+              {/* Stock availability */}
+              <div>
+                <h3 className="font-semibold text-sm mb-3" style={{ color: '#0A2342' }}>Availability</h3>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={inStockOnly}
+                    onChange={e => { setInStockOnly(e.target.checked); setPage(1); }}
+                    className="w-4 h-4 rounded"
+                    style={{ accentColor: '#0A2342' }}
+                  />
+                  <span className="text-sm text-gray-600">In Stock Only</span>
+                </label>
               </div>
 
               {/* Genre filter */}
-              <div className="mb-5">
+              <div>
                 <h3 className="font-semibold text-sm mb-3" style={{ color: '#0A2342' }}>Genre</h3>
                 <div className="space-y-2">
                   {genres.map(genre => (
@@ -121,8 +167,37 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* Author filter */}
+              <div>
+                <h3 className="font-semibold text-sm mb-3" style={{ color: '#0A2342' }}>Author</h3>
+                <input
+                  type="text"
+                  value={authorSearchQ}
+                  onChange={e => setAuthorSearchQ(e.target.value)}
+                  placeholder="Search authors..."
+                  className="w-full px-3 py-1.5 border border-gray-200 rounded-lg text-xs mb-2 focus:outline-none"
+                />
+                <div className="space-y-2 max-h-36 overflow-y-auto pr-1">
+                  {filteredAuthors.map(author => (
+                    <label key={author} className="flex items-center gap-2 cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        checked={selectedAuthors.includes(author)}
+                        onChange={() => toggleAuthor(author)}
+                        className="w-4 h-4 rounded flex-shrink-0"
+                        style={{ accentColor: '#0A2342' }}
+                      />
+                      <span className="text-xs text-gray-600 group-hover:text-gray-900 line-clamp-1">{author}</span>
+                    </label>
+                  ))}
+                  {filteredAuthors.length === 0 && (
+                    <p className="text-xs text-gray-400">No authors found.</p>
+                  )}
+                </div>
+              </div>
+
               {/* Price range */}
-              <div className="mb-5">
+              <div>
                 <h3 className="font-semibold text-sm mb-3" style={{ color: '#0A2342' }}>Max Price</h3>
                 <input
                   type="range"
@@ -143,7 +218,7 @@ export default function Home() {
               {/* Rating filter */}
               <div>
                 <h3 className="font-semibold text-sm mb-3" style={{ color: '#0A2342' }}>Min Rating</h3>
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   {[0, 3, 3.5, 4, 4.5].map(r => (
                     <label key={r} className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -166,7 +241,7 @@ export default function Home() {
           {/* Main content */}
           <div className="flex-1 min-w-0">
             {/* Sort + results count */}
-            <div className="flex items-center justify-between mb-6 gap-4">
+            <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
               <p className="text-gray-500 text-sm">
                 <span className="font-semibold" style={{ color: '#0A2342' }}>{filtered.length}</span> books found
               </p>
@@ -179,8 +254,40 @@ export default function Home() {
                 <option value="price-asc">Price: Low to High</option>
                 <option value="price-desc">Price: High to Low</option>
                 <option value="rating">Highest Rated</option>
+                <option value="title-az">Title: A–Z</option>
               </select>
             </div>
+
+            {/* Active filter tags */}
+            {activeFilterCount > 0 && (
+              <div className="flex flex-wrap gap-2 mb-5">
+                {selectedGenres.map(g => (
+                  <span key={g} className="flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full bg-blue-50 cursor-pointer hover:bg-blue-100" style={{ color: '#0A2342' }} onClick={() => toggleGenre(g)}>
+                    {g} ×
+                  </span>
+                ))}
+                {selectedAuthors.map(a => (
+                  <span key={a} className="flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full bg-purple-50 text-purple-700 cursor-pointer hover:bg-purple-100 truncate max-w-[160px]" onClick={() => toggleAuthor(a)}>
+                    {a} ×
+                  </span>
+                ))}
+                {inStockOnly && (
+                  <span className="flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full bg-green-50 text-green-700 cursor-pointer hover:bg-green-100" onClick={() => setInStockOnly(false)}>
+                    In Stock ×
+                  </span>
+                )}
+                {minRating > 0 && (
+                  <span className="flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full bg-yellow-50 text-yellow-700 cursor-pointer hover:bg-yellow-100" onClick={() => setMinRating(0)}>
+                    {minRating}+ ⭐ ×
+                  </span>
+                )}
+                {priceRange[1] < 300000 && (
+                  <span className="flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full bg-gray-100 text-gray-700 cursor-pointer hover:bg-gray-200" onClick={() => setPriceRange([0, 300000])}>
+                    Max {formatPrice(priceRange[1])} ×
+                  </span>
+                )}
+              </div>
+            )}
 
             {/* Books grid */}
             {paginated.length > 0 ? (
@@ -199,7 +306,7 @@ export default function Home() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-10">
+              <div className="flex items-center justify-center gap-2 mt-10 flex-wrap">
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}

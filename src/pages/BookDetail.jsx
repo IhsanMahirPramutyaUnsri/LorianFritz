@@ -2,6 +2,8 @@ import { useParams, Link } from 'react-router-dom';
 import { useState } from 'react';
 import { books } from '../data/books';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
+import { useToast } from '../context/ToastContext';
 import StarRating from '../components/StarRating';
 import BookCard from '../components/BookCard';
 
@@ -9,6 +11,8 @@ export default function BookDetail() {
   const { id } = useParams();
   const book = books.find(b => b.id === parseInt(id));
   const { addToCart } = useCart();
+  const { toggle, isWishlisted } = useWishlist();
+  const { addToast } = useToast();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
@@ -29,10 +33,18 @@ export default function BookDetail() {
 
   const relatedBooks = books.filter(b => b.genre === book.genre && b.id !== book.id).slice(0, 4);
 
+  const wishlisted = isWishlisted(book?.id);
+
   const handleAddToCart = () => {
     addToCart(book, quantity);
+    addToast(`"${book.title}" added to cart`);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
+  };
+
+  const handleWishlist = () => {
+    toggle(book);
+    addToast(wishlisted ? 'Removed from wishlist' : 'Added to wishlist ❤️', wishlisted ? 'info' : 'success');
   };
 
   return (
@@ -107,7 +119,7 @@ export default function BookDetail() {
 
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 <p className="text-3xl font-bold" style={{ color: '#0A2342' }}>{formatPrice(book.price)}</p>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
                   <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
                     <button
                       onClick={() => setQuantity(q => Math.max(1, q - 1))}
@@ -143,6 +155,18 @@ export default function BookDetail() {
                         Add to Cart
                       </>
                     )}
+                  </button>
+                  {/* Wishlist button */}
+                  <button
+                    onClick={handleWishlist}
+                    aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+                    className="flex items-center gap-2 font-semibold px-5 py-3 rounded-xl border-2 transition-all duration-200 hover:bg-red-50"
+                    style={{ borderColor: wishlisted ? '#e11d48' : '#e5e7eb', color: wishlisted ? '#e11d48' : '#6b7280' }}
+                  >
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill={wishlisted ? '#e11d48' : 'none'} stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    {wishlisted ? 'Wishlisted' : 'Wishlist'}
                   </button>
                 </div>
               </div>
