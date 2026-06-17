@@ -8,7 +8,7 @@ export default function CartItem({ item }) {
     new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price);
 
   return (
-    <div className="flex items-center gap-4 bg-white border border-gray-200 rounded-xl p-4">
+    <div className="flex items-center gap-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
       <Link to={`/books/${item.id}`}>
         <img
           src={item.coverUrl}
@@ -24,8 +24,8 @@ export default function CartItem({ item }) {
         <Link to={`/books/${item.id}`} className="no-underline">
           <h3 className="font-semibold text-sm leading-tight line-clamp-2" style={{ color: '#0A2342' }}>{item.title}</h3>
         </Link>
-        <p className="text-gray-500 text-xs mt-0.5">{item.author}</p>
-        <p className="text-gray-400 text-xs mt-0.5">{item.genre}</p>
+        <p className="text-gray-500 dark:text-gray-400 text-xs mt-0.5">{item.author}</p>
+        <p className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">{item.genre}</p>
         <p className="font-semibold text-sm mt-1" style={{ color: '#0A2342' }}>{formatPrice(item.price)}</p>
       </div>
 
@@ -40,17 +40,17 @@ export default function CartItem({ item }) {
           </svg>
         </button>
 
-        <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+        <div className="flex items-center border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden">
           <button
             onClick={() => updateQuantity(item.id, item.quantity - 1)}
-            className="w-7 h-7 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors text-sm font-medium"
+            className="w-7 h-7 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
           >
             −
           </button>
           <span className="w-8 text-center text-sm font-semibold" style={{ color: '#0A2342' }}>{item.quantity}</span>
           <button
             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-            className="w-7 h-7 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors text-sm font-medium"
+            className="w-7 h-7 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
           >
             +
           </button>

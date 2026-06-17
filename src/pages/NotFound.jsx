@@ -12,7 +12,7 @@ export default function NotFound() {
   }, [count, navigate]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
       <div className="text-center max-w-md">
         {/* Large 404 */}
         <div className="relative mb-6">
@@ -25,7 +25,7 @@ export default function NotFound() {
           </div>
         </div>
 
-        <p className="text-gray-500 mb-2">
+        <p className="text-gray-500 dark:text-gray-400 mb-2">
           The page you're looking for doesn't exist or has been moved.
         </p>
         <p className="text-gray-400 text-sm mb-8">

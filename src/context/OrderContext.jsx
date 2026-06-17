@@ -36,8 +36,12 @@ export function OrderProvider({ children }) {
 
   const getOrdersByUser = (userId) => orders.filter(o => o.userId === userId);
 
+  const updateOrderStatus = (orderId, status) => {
+    setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status } : o)));
+  };
+
   return (
-    <OrderContext.Provider value={{ orders, placeOrder, getOrdersByUser }}>
+    <OrderContext.Provider value={{ orders, placeOrder, getOrdersByUser, updateOrderStatus }}>
       {children}
     </OrderContext.Provider>
   );

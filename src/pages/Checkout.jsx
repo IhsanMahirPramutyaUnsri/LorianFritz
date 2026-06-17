@@ -114,7 +114,7 @@ export default function Checkout() {
 
   if (items.length === 0 && step < 2) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
         <div className="text-center">
           <p className="text-6xl mb-4">🛒</p>
           <h2 className="text-2xl font-bold mb-2" style={{ color: '#0A2342' }}>Your cart is empty</h2>
@@ -131,7 +131,7 @@ export default function Checkout() {
     `w-full px-4 py-3 rounded-xl border text-sm focus:outline-none transition-colors ${hasErr ? 'border-red-400' : 'border-gray-200 focus:border-blue-300'}`;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <div style={{ backgroundColor: '#0A2342' }} className="py-6 px-4">
         <div className="max-w-5xl mx-auto">
@@ -168,18 +168,18 @@ export default function Checkout() {
 
             {/* ── Step 0: Shipping ── */}
             {step === 0 && (
-              <form onSubmit={handleShippingNext} noValidate className="bg-white rounded-2xl border border-gray-200 p-7 space-y-5">
+              <form onSubmit={handleShippingNext} noValidate className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-7 space-y-5">
                 <h2 className="text-lg font-bold" style={{ color: '#0A2342' }}>Shipping Address</h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name *</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Full Name *</label>
                     <input className={inputCls(shippingErrors.fullName)} value={shipping.fullName}
                       onChange={e => setShipping(p => ({ ...p, fullName: e.target.value }))} placeholder="John Doe" />
                     <FieldErr msg={shippingErrors.fullName} />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Email *</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email *</label>
                     <input className={inputCls(shippingErrors.email)} value={shipping.email} type="email"
                       onChange={e => setShipping(p => ({ ...p, email: e.target.value }))} placeholder="you@example.com" />
                     <FieldErr msg={shippingErrors.email} />
@@ -187,14 +187,14 @@ export default function Checkout() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Phone Number *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Phone Number *</label>
                   <input className={inputCls(shippingErrors.phone)} value={shipping.phone} type="tel"
                     onChange={e => setShipping(p => ({ ...p, phone: e.target.value }))} placeholder="e.g. 08123456789" />
                   <FieldErr msg={shippingErrors.phone} />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Street Address *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Street Address *</label>
                   <input className={inputCls(shippingErrors.address)} value={shipping.address}
                     onChange={e => setShipping(p => ({ ...p, address: e.target.value }))} placeholder="Jl. Example No. 1" />
                   <FieldErr msg={shippingErrors.address} />
@@ -202,19 +202,19 @@ export default function Checkout() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">City *</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">City *</label>
                     <input className={inputCls(shippingErrors.city)} value={shipping.city}
                       onChange={e => setShipping(p => ({ ...p, city: e.target.value }))} placeholder="Jakarta" />
                     <FieldErr msg={shippingErrors.city} />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Province *</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Province *</label>
                     <input className={inputCls(shippingErrors.province)} value={shipping.province}
                       onChange={e => setShipping(p => ({ ...p, province: e.target.value }))} placeholder="DKI Jakarta" />
                     <FieldErr msg={shippingErrors.province} />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Postal Code *</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Postal Code *</label>
                     <input className={inputCls(shippingErrors.postalCode)} value={shipping.postalCode}
                       onChange={e => setShipping(p => ({ ...p, postalCode: e.target.value }))} placeholder="10110" maxLength={5} />
                     <FieldErr msg={shippingErrors.postalCode} />
@@ -226,7 +226,7 @@ export default function Checkout() {
                   <h3 className="font-semibold text-sm mb-3" style={{ color: '#0A2342' }}>Shipping Method</h3>
                   <div className="space-y-3">
                     {SHIPPING_OPTIONS.map(opt => (
-                      <label key={opt.id} className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${shipping.shippingOption === opt.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'}`}>
+                      <label key={opt.id} className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-colors ${shipping.shippingOption === opt.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30' : 'border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'}`}>
                         <div className="flex items-center gap-3">
                           <input
                             type="radio"
@@ -237,8 +237,8 @@ export default function Checkout() {
                             style={{ accentColor: '#0A2342' }}
                           />
                           <div>
-                            <p className="text-sm font-medium text-gray-800">{opt.label}</p>
-                            <p className="text-xs text-gray-400">{opt.duration}</p>
+                            <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{opt.label}</p>
+                            <p className="text-xs text-gray-400 dark:text-gray-500">{opt.duration}</p>
                           </div>
                         </div>
                         <span className="text-sm font-semibold" style={{ color: '#0A2342' }}>
@@ -257,7 +257,7 @@ export default function Checkout() {
 
             {/* ── Step 1: Payment ── */}
             {step === 1 && (
-              <form onSubmit={handlePaymentNext} noValidate className="bg-white rounded-2xl border border-gray-200 p-7 space-y-5">
+              <form onSubmit={handlePaymentNext} noValidate className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-7 space-y-5">
                 <h2 className="text-lg font-bold" style={{ color: '#0A2342' }}>Payment Method</h2>
 
                 {paymentErrors.method && (
@@ -266,7 +266,7 @@ export default function Checkout() {
 
                 <div className="space-y-3">
                   {PAYMENT_METHODS.map(m => (
-                    <label key={m.id} className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-colors ${payment.method === m.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'}`}>
+                    <label key={m.id} className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-colors ${payment.method === m.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30' : 'border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'}`}>
                       <input
                         type="radio"
                         name="payment"
@@ -276,7 +276,7 @@ export default function Checkout() {
                         style={{ accentColor: '#0A2342' }}
                       />
                       <span className="text-lg">{m.icon}</span>
-                      <span className="text-sm font-medium text-gray-800">{m.label}</span>
+                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{m.label}</span>
                     </label>
                   ))}
                 </div>
@@ -285,7 +285,7 @@ export default function Checkout() {
                 {payment.method === 'card' && (
                   <div className="space-y-4 border-t border-gray-100 pt-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Card Number *</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Card Number *</label>
                       <input
                         className={inputCls(paymentErrors.cardNumber)}
                         value={payment.cardNumber}
@@ -300,14 +300,14 @@ export default function Checkout() {
                       <FieldErr msg={paymentErrors.cardNumber} />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">Cardholder Name *</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Cardholder Name *</label>
                       <input className={inputCls(paymentErrors.cardName)} value={payment.cardName}
                         onChange={e => setPayment(p => ({ ...p, cardName: e.target.value }))} placeholder="JOHN DOE" />
                       <FieldErr msg={paymentErrors.cardName} />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Expiry (MM/YY) *</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Expiry (MM/YY) *</label>
                         <input
                           className={inputCls(paymentErrors.cardExpiry)}
                           value={payment.cardExpiry}
@@ -321,7 +321,7 @@ export default function Checkout() {
                         <FieldErr msg={paymentErrors.cardExpiry} />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">CVV *</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">CVV *</label>
                         <input className={inputCls(paymentErrors.cardCvv)} value={payment.cardCvv} type="password"
                           onChange={e => setPayment(p => ({ ...p, cardCvv: e.target.value.replace(/\D/g, '').slice(0, 4) }))}
                           placeholder="•••" maxLength={4} />
@@ -332,7 +332,7 @@ export default function Checkout() {
                 )}
 
                 <div className="flex gap-3 pt-2">
-                  <button type="button" onClick={() => setStep(0)} className="flex-1 font-semibold py-3.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+                  <button type="button" onClick={() => setStep(0)} className="flex-1 font-semibold py-3.5 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     ← Back
                   </button>
                   <button type="submit" className="flex-1 text-white font-semibold py-3.5 rounded-xl hover:opacity-90 transition-opacity" style={{ backgroundColor: '#0A2342' }}>
@@ -344,28 +344,28 @@ export default function Checkout() {
 
             {/* ── Step 2: Confirmation ── */}
             {step === 2 && (
-              <div className="bg-white rounded-2xl border border-gray-200 p-7 space-y-6">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-7 space-y-6">
                 <h2 className="text-lg font-bold" style={{ color: '#0A2342' }}>Order Confirmation</h2>
 
                 {/* Shipping summary */}
-                <div className="bg-gray-50 rounded-xl p-4 space-y-1 text-sm">
-                  <p className="font-semibold text-gray-700 mb-2">Shipping to:</p>
-                  <p className="text-gray-600">{shipping.fullName}</p>
-                  <p className="text-gray-600">{shipping.address}</p>
-                  <p className="text-gray-600">{shipping.city}, {shipping.province} {shipping.postalCode}</p>
-                  <p className="text-gray-600">{shipping.phone} · {shipping.email}</p>
+                <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 space-y-1 text-sm">
+                  <p className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Shipping to:</p>
+                  <p className="text-gray-600 dark:text-gray-400">{shipping.fullName}</p>
+                  <p className="text-gray-600 dark:text-gray-400">{shipping.address}</p>
+                  <p className="text-gray-600 dark:text-gray-400">{shipping.city}, {shipping.province} {shipping.postalCode}</p>
+                  <p className="text-gray-600 dark:text-gray-400">{shipping.phone} · {shipping.email}</p>
                   <p className="text-gray-500 text-xs mt-2">📦 {selectedShipping.label} — {selectedShipping.duration}</p>
                 </div>
 
                 {/* Payment summary */}
-                <div className="bg-gray-50 rounded-xl p-4 text-sm">
-                  <p className="font-semibold text-gray-700 mb-1">Payment via:</p>
-                  <p className="text-gray-600">{PAYMENT_METHODS.find(m => m.id === payment.method)?.label}</p>
+                <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 text-sm">
+                  <p className="font-semibold text-gray-700 dark:text-gray-300 mb-1">Payment via:</p>
+                  <p className="text-gray-600 dark:text-gray-400">{PAYMENT_METHODS.find(m => m.id === payment.method)?.label}</p>
                 </div>
 
                 {/* Items */}
                 <div>
-                  <p className="font-semibold text-gray-700 mb-3 text-sm">Items ({items.reduce((s, i) => s + i.quantity, 0)})</p>
+                  <p className="font-semibold text-gray-700 dark:text-gray-300 mb-3 text-sm">Items ({items.reduce((s, i) => s + i.quantity, 0)})</p>
                   <div className="space-y-3">
                     {items.map(item => (
                       <div key={item.id} className="flex items-center gap-3">
@@ -376,8 +376,8 @@ export default function Checkout() {
                           onError={e => { e.target.src = 'https://via.placeholder.com/40x50/0A2342/ffffff?text=B'; }}
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-800 line-clamp-1">{item.title}</p>
-                          <p className="text-xs text-gray-400">x{item.quantity}</p>
+                          <p className="text-sm font-medium text-gray-800 dark:text-gray-200 line-clamp-1">{item.title}</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500">x{item.quantity}</p>
                         </div>
                         <p className="text-sm font-semibold flex-shrink-0" style={{ color: '#0A2342' }}>
                           {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(item.price * item.quantity)}
@@ -388,7 +388,7 @@ export default function Checkout() {
                 </div>
 
                 <div className="flex gap-3">
-                  <button type="button" onClick={() => setStep(1)} className="flex-1 font-semibold py-3.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+                  <button type="button" onClick={() => setStep(1)} className="flex-1 font-semibold py-3.5 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     ← Back
                   </button>
                   <button
@@ -406,7 +406,7 @@ export default function Checkout() {
 
           {/* Right panel: order summary */}
           <div className="lg:w-80 flex-shrink-0">
-            <div className="bg-white rounded-2xl border border-gray-200 p-6 sticky top-24">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 sticky top-24">
               <h2 className="font-bold text-base mb-4" style={{ color: '#0A2342' }}>Order Summary</h2>
               <div className="space-y-3 max-h-52 overflow-y-auto mb-4">
                 {items.map(item => (
@@ -421,13 +421,13 @@ export default function Checkout() {
                 ))}
               </div>
               <div className="border-t border-gray-100 pt-4 space-y-2 text-sm">
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-gray-600 dark:text-gray-400">
                   <span>Subtotal</span><span>{formatPrice(subtotal)}</span>
                 </div>
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-gray-600 dark:text-gray-400">
                   <span>Tax (11%)</span><span>{formatPrice(tax)}</span>
                 </div>
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-gray-600 dark:text-gray-400">
                   <span>Shipping</span>
                   <span>{selectedShipping.price === 0 ? <span className="text-green-600">Free</span> : formatPrice(selectedShipping.price)}</span>
                 </div>

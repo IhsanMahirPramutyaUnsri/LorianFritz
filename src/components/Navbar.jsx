@@ -2,12 +2,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { useState } from 'react';
 
 export default function Navbar() {
   const { totalItems } = useCart();
   const { items: wishlistItems } = useWishlist();
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -34,6 +36,11 @@ export default function Navbar() {
             {user && (
               <Link to="/orders" className="text-white/80 hover:text-white transition-colors text-sm font-medium no-underline">
                 Orders
+              </Link>
+            )}
+            {user && (
+              <Link to="/profile" className="text-white/80 hover:text-white transition-colors text-sm font-medium no-underline">
+                Profile
               </Link>
             )}
             {user?.role === 'admin' && (
@@ -66,6 +73,23 @@ export default function Navbar() {
               </div>
             )}
 
+            {/* Dark mode toggle */}
+            <button
+              onClick={toggleTheme}
+              aria-label="Toggle dark mode"
+              className="text-white/80 hover:text-white transition-colors"
+            >
+              {theme === 'dark' ? (
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              ) : (
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+              )}
+            </button>
+
             {/* Wishlist icon */}
             <Link to="/wishlist" className="relative text-white no-underline" aria-label="Wishlist">
               <svg className="h-6 w-6" fill={wishlistItems.length > 0 ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -93,6 +117,17 @@ export default function Navbar() {
 
           {/* Mobile icons + hamburger */}
           <div className="md:hidden flex items-center gap-3">
+            <button onClick={toggleTheme} aria-label="Toggle dark mode" className="text-white">
+              {theme === 'dark' ? (
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              ) : (
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+              )}
+            </button>
             <Link to="/wishlist" className="relative text-white no-underline">
               <svg className="h-5 w-5" fill={wishlistItems.length > 0 ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -135,6 +170,9 @@ export default function Navbar() {
           <Link to="/" onClick={() => setMenuOpen(false)} className="text-white/80 hover:text-white text-sm font-medium no-underline">Catalog</Link>
           {user && (
             <Link to="/orders" onClick={() => setMenuOpen(false)} className="text-white/80 hover:text-white text-sm font-medium no-underline">Orders</Link>
+          )}
+          {user && (
+            <Link to="/profile" onClick={() => setMenuOpen(false)} className="text-white/80 hover:text-white text-sm font-medium no-underline">Profile</Link>
           )}
           {user?.role === 'admin' && (
             <Link to="/admin" onClick={() => setMenuOpen(false)} className="text-white/80 hover:text-white text-sm font-medium no-underline">Admin</Link>

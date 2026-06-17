@@ -3,6 +3,7 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useToast } from '../context/ToastContext';
 import StarRating from './StarRating';
+import ImageWithSkeleton from './ImageWithSkeleton';
 
 export default function BookCard({ book }) {
   const { addToCart } = useCart();
@@ -10,6 +11,8 @@ export default function BookCard({ book }) {
   const { addToast } = useToast();
   const wishlisted = isWishlisted(book.id);
   const outOfStock = book.stock === 0;
+  const hasDiscount = book.discount > 0;
+  const discountedPrice = hasDiscount ? Math.round(book.price * (1 - book.discount / 100)) : book.price;
 
   const formatPrice = (price) =>
     new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price);
@@ -17,7 +20,7 @@ export default function BookCard({ book }) {
   const handleAddToCart = (e) => {
     e.preventDefault();
     if (outOfStock) return;
-    addToCart(book);
+    addToCart({ ...book, price: discountedPrice });
     addToast(`"${book.title}" added to cart`);
   };
 
@@ -28,21 +31,25 @@ export default function BookCard({ book }) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-xl hover:scale-[1.02] transition-all duration-200 flex flex-col group">
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-xl hover:scale-[1.02] transition-all duration-200 flex flex-col group">
       <Link to={`/books/${book.id}`} className="no-underline">
-        <div className="relative overflow-hidden bg-gray-100 h-56">
-          <img
+        <div className="relative overflow-hidden bg-gray-100 dark:bg-gray-700 h-56">
+          <ImageWithSkeleton
             src={book.coverUrl}
             alt={book.title}
             className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${outOfStock ? 'opacity-60' : ''}`}
-            onError={e => {
-              e.target.src = `https://via.placeholder.com/300x400/0A2342/ffffff?text=${encodeURIComponent(book.title)}`;
-            }}
+            fallback={`https://via.placeholder.com/300x400/0A2342/ffffff?text=${encodeURIComponent(book.title)}`}
           />
           {/* Genre badge */}
           <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-xs font-semibold px-2 py-1 rounded-full" style={{ color: '#0A2342' }}>
             {book.genre}
           </div>
+          {/* Discount badge */}
+          {hasDiscount && !outOfStock && (
+            <div className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+              -{book.discount}%
+            </div>
+          )}
           {/* Out of stock overlay */}
           {outOfStock && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
@@ -63,7 +70,7 @@ export default function BookCard({ book }) {
           <button
             onClick={handleWishlist}
             aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 transition-colors"
+            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill={wishlisted ? '#e11d48' : 'none'} stroke={wishlisted ? '#e11d48' : '#9ca3af'} strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -71,17 +78,24 @@ export default function BookCard({ book }) {
           </button>
         </div>
 
-        <p className="text-gray-500 text-sm mb-2">{book.author}</p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">{book.author}</p>
 
         <div className="flex items-center gap-1 mb-3">
           <StarRating rating={book.rating} size="sm" />
-          <span className="text-gray-400 text-xs ml-1">{book.rating}</span>
+          <span className="text-gray-400 dark:text-gray-500 text-xs ml-1">{book.rating}</span>
         </div>
 
         <div className="mt-auto flex items-center justify-between gap-2">
-          <span className="font-bold text-base" style={{ color: '#0A2342' }}>
-            {formatPrice(book.price)}
-          </span>
+          <div className="flex flex-col">
+            {hasDiscount ? (
+              <>
+                <span className="text-gray-400 dark:text-gray-500 text-xs line-through">{formatPrice(book.price)}</span>
+                <span className="font-bold text-base text-red-600">{formatPrice(discountedPrice)}</span>
+              </>
+            ) : (
+              <span className="font-bold text-base" style={{ color: '#0A2342' }}>{formatPrice(book.price)}</span>
+            )}
+          </div>
           <button
             onClick={handleAddToCart}
             disabled={outOfStock}

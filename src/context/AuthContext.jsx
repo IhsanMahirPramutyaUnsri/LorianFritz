@@ -68,8 +68,32 @@ export function AuthProvider({ children }) {
 
   const logout = () => setUser(null);
 
+  const updateProfile = (updates) => {
+    setUsers(prev => prev.map(u => (u.id === user.id ? { ...u, ...updates } : u)));
+    setUser(prev => ({ ...prev, ...updates }));
+    return { success: true };
+  };
+
+  const changePassword = (currentPassword, newPassword) => {
+    const found = users.find(u => u.id === user.id);
+    if (!found || found.password !== currentPassword) {
+      return { success: false, error: 'Current password is incorrect.' };
+    }
+    setUsers(prev => prev.map(u => (u.id === user.id ? { ...u, password: newPassword } : u)));
+    return { success: true };
+  };
+
+  const updateUserRole = (userId, role) => {
+    setUsers(prev => prev.map(u => (u.id === userId ? { ...u, role } : u)));
+    if (user?.id === userId) setUser(prev => ({ ...prev, role }));
+  };
+
+  const deleteUser = (userId) => {
+    setUsers(prev => prev.filter(u => u.id !== userId));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, users, login, register, logout }}>
+    <AuthContext.Provider value={{ user, users, login, register, logout, updateProfile, changePassword, updateUserRole, deleteUser }}>
       {children}
     </AuthContext.Provider>
   );
