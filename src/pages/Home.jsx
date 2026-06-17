@@ -95,16 +95,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero */}
-      <div style={{ background: 'linear-gradient(135deg, #0A2342 0%, #0d2d55 100%)' }} className="text-white py-10 px-4">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Discover Your Next Great Read</h1>
-          <p className="text-white/70 text-lg max-w-xl mx-auto">
-            Explore books across every genre, from timeless classics to modern bestsellers.
-          </p>
-        </div>
-      </div>
-
       {/* Promo slideshow */}
       <PromoSlideshow />
 
