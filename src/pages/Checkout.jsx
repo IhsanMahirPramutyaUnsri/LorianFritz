@@ -12,12 +12,10 @@ const SHIPPING_OPTIONS = [
   { id: 'same-day', label: 'Same-Day Delivery', duration: 'Today (order before 12:00)', price: 65000 },
 ];
 const PAYMENT_METHODS = [
-  { id: 'bca', label: 'BCA Virtual Account', icon: '🏦' },
-  { id: 'mandiri', label: 'Mandiri Virtual Account', icon: '🏦' },
   { id: 'gopay', label: 'GoPay', icon: '💚' },
-  { id: 'ovo', label: 'OVO', icon: '💜' },
-  { id: 'card', label: 'Credit / Debit Card', icon: '💳' },
+  { id: 'shopeepay', label: 'ShopeePay', icon: '🧡' },
 ];
+const PAYMENT_NUMBER = '085349851329';
 
 const STEPS = ['Shipping', 'Payment', 'Confirmation'];
 
@@ -40,7 +38,7 @@ export default function Checkout() {
     shippingOption: 'regular',
   });
   const [shippingErrors, setShippingErrors] = useState({});
-  const [payment, setPayment] = useState({ method: '', cardNumber: '', cardName: '', cardExpiry: '', cardCvv: '' });
+  const [payment, setPayment] = useState({ method: '' });
   const [paymentErrors, setPaymentErrors] = useState({});
   const [placing, setPlacing] = useState(false);
 
@@ -70,12 +68,6 @@ export default function Checkout() {
   const validatePayment = () => {
     const e = {};
     if (!payment.method) e.method = 'Please select a payment method.';
-    if (payment.method === 'card') {
-      if (!payment.cardNumber.replace(/\s/g, '').match(/^\d{16}$/)) e.cardNumber = 'Enter a valid 16-digit card number.';
-      if (!payment.cardName.trim()) e.cardName = 'Cardholder name is required.';
-      if (!payment.cardExpiry.match(/^\d{2}\/\d{2}$/)) e.cardExpiry = 'Enter expiry as MM/YY.';
-      if (!payment.cardCvv.match(/^\d{3,4}$/)) e.cardCvv = 'Enter a valid CVV.';
-    }
     return e;
   };
 
@@ -281,52 +273,12 @@ export default function Checkout() {
                   ))}
                 </div>
 
-                {/* Credit card fields */}
-                {payment.method === 'card' && (
-                  <div className="space-y-4 border-t border-gray-100 pt-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Card Number *</label>
-                      <input
-                        className={inputCls(paymentErrors.cardNumber)}
-                        value={payment.cardNumber}
-                        onChange={e => {
-                          const v = e.target.value.replace(/\D/g, '').slice(0, 16);
-                          const formatted = v.replace(/(.{4})/g, '$1 ').trim();
-                          setPayment(p => ({ ...p, cardNumber: formatted }));
-                        }}
-                        placeholder="1234 5678 9012 3456"
-                        maxLength={19}
-                      />
-                      <FieldErr msg={paymentErrors.cardNumber} />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Cardholder Name *</label>
-                      <input className={inputCls(paymentErrors.cardName)} value={payment.cardName}
-                        onChange={e => setPayment(p => ({ ...p, cardName: e.target.value }))} placeholder="JOHN DOE" />
-                      <FieldErr msg={paymentErrors.cardName} />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Expiry (MM/YY) *</label>
-                        <input
-                          className={inputCls(paymentErrors.cardExpiry)}
-                          value={payment.cardExpiry}
-                          onChange={e => {
-                            let v = e.target.value.replace(/\D/g, '').slice(0, 4);
-                            if (v.length >= 3) v = v.slice(0, 2) + '/' + v.slice(2);
-                            setPayment(p => ({ ...p, cardExpiry: v }));
-                          }}
-                          placeholder="MM/YY" maxLength={5}
-                        />
-                        <FieldErr msg={paymentErrors.cardExpiry} />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">CVV *</label>
-                        <input className={inputCls(paymentErrors.cardCvv)} value={payment.cardCvv} type="password"
-                          onChange={e => setPayment(p => ({ ...p, cardCvv: e.target.value.replace(/\D/g, '').slice(0, 4) }))}
-                          placeholder="•••" maxLength={4} />
-                        <FieldErr msg={paymentErrors.cardCvv} />
-                      </div>
+                {/* Payment instructions */}
+                {payment.method && (
+                  <div className="border-t border-gray-100 dark:border-gray-700 pt-4">
+                    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 text-sm text-gray-600 dark:text-gray-400">
+                      Send your payment via <strong style={{ color: '#0A2342' }}>{PAYMENT_METHODS.find(m => m.id === payment.method)?.label}</strong> to the number below, then continue to review your order.
+                      <p className="text-lg font-bold mt-2" style={{ color: '#0A2342' }}>{PAYMENT_NUMBER}</p>
                     </div>
                   </div>
                 )}

@@ -1,9 +1,9 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Navbar() {
   const { totalItems } = useCart();
@@ -11,11 +11,23 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [query, setQuery] = useState(searchParams.get('q') || '');
+
+  useEffect(() => {
+    setQuery(searchParams.get('q') || '');
+  }, [searchParams]);
 
   const handleLogout = () => {
     logout();
     navigate('/');
+    setMenuOpen(false);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    navigate(query.trim() ? `/?q=${encodeURIComponent(query.trim())}` : '/');
     setMenuOpen(false);
   };
 
@@ -24,9 +36,25 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 no-underline">
+          <Link to="/" className="flex items-center gap-2 no-underline flex-shrink-0">
             <span className="text-white text-2xl font-bold tracking-tight">📚 Fritzoria</span>
           </Link>
+
+          {/* Center search bar - desktop */}
+          <form onSubmit={handleSearchSubmit} className="hidden md:flex flex-1 max-w-md mx-6 relative">
+            <input
+              type="text"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Search by title or author..."
+              className="w-full pl-4 pr-10 py-2 rounded-lg text-sm text-gray-800 bg-white focus:outline-none"
+            />
+            <button type="submit" aria-label="Search" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+          </form>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-7">
@@ -167,6 +195,20 @@ export default function Navbar() {
       {/* Mobile dropdown menu */}
       {menuOpen && (
         <div style={{ backgroundColor: '#0d2d55' }} className="md:hidden px-4 py-4 flex flex-col gap-3 border-t border-white/10">
+          <form onSubmit={handleSearchSubmit} className="relative">
+            <input
+              type="text"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Search by title or author..."
+              className="w-full pl-4 pr-10 py-2 rounded-lg text-sm text-gray-800 bg-white focus:outline-none"
+            />
+            <button type="submit" aria-label="Search" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+          </form>
           <Link to="/" onClick={() => setMenuOpen(false)} className="text-white/80 hover:text-white text-sm font-medium no-underline">Catalog</Link>
           {user && (
             <Link to="/orders" onClick={() => setMenuOpen(false)} className="text-white/80 hover:text-white text-sm font-medium no-underline">Orders</Link>
