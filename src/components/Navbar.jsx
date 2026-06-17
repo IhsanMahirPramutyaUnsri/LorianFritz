@@ -3,7 +3,7 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function Navbar() {
   const { totalItems } = useCart();
@@ -13,16 +13,30 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [query, setQuery] = useState(searchParams.get('q') || '');
+  const accountMenuRef = useRef(null);
 
   useEffect(() => {
     setQuery(searchParams.get('q') || '');
   }, [searchParams]);
 
+  useEffect(() => {
+    if (!accountMenuOpen) return;
+    const handleClickOutside = (e) => {
+      if (accountMenuRef.current && !accountMenuRef.current.contains(e.target)) {
+        setAccountMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [accountMenuOpen]);
+
   const handleLogout = () => {
     logout();
     navigate('/');
     setMenuOpen(false);
+    setAccountMenuOpen(false);
   };
 
   const handleSearchSubmit = (e) => {
@@ -57,49 +71,10 @@ export default function Navbar() {
           </form>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-7">
+          <div className="hidden md:flex items-center gap-6">
             <Link to="/" className="text-white/80 hover:text-white transition-colors text-sm font-medium no-underline">
               Catalog
             </Link>
-            {user && (
-              <Link to="/orders" className="text-white/80 hover:text-white transition-colors text-sm font-medium no-underline">
-                Orders
-              </Link>
-            )}
-            {user && (
-              <Link to="/profile" className="text-white/80 hover:text-white transition-colors text-sm font-medium no-underline">
-                Profile
-              </Link>
-            )}
-            {user?.role === 'admin' && (
-              <Link to="/admin" className="text-white/80 hover:text-white transition-colors text-sm font-medium no-underline">
-                Admin
-              </Link>
-            )}
-            {user ? (
-              <div className="flex items-center gap-4">
-                <span className="text-white/50 text-sm">Hi, {user.name}</span>
-                <button
-                  onClick={handleLogout}
-                  className="text-white/80 hover:text-white text-sm font-medium transition-colors"
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-4">
-                <Link to="/login" className="text-white/80 hover:text-white text-sm font-medium no-underline transition-colors">
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="bg-white text-sm font-medium px-4 py-2 rounded-lg transition-colors no-underline"
-                  style={{ color: '#0A2342' }}
-                >
-                  Register
-                </Link>
-              </div>
-            )}
 
             {/* Dark mode toggle */}
             <button
@@ -141,6 +116,58 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
+
+            {/* Account menu */}
+            <div className="relative" ref={accountMenuRef}>
+              <button
+                onClick={() => setAccountMenuOpen(o => !o)}
+                aria-label="Account menu"
+                className="text-white/80 hover:text-white transition-colors"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+
+              {accountMenuOpen && (
+                <div className="absolute right-0 mt-3 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 text-sm">
+                  {user ? (
+                    <>
+                      <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+                        <p className="text-gray-400 dark:text-gray-500 text-xs">Signed in as</p>
+                        <p className="font-semibold truncate" style={{ color: '#0A2342' }}>{user.name}</p>
+                      </div>
+                      <Link to="/profile" onClick={() => setAccountMenuOpen(false)} className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 no-underline">
+                        Profile
+                      </Link>
+                      <Link to="/orders" onClick={() => setAccountMenuOpen(false)} className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 no-underline">
+                        Orders
+                      </Link>
+                      {user.role === 'admin' && (
+                        <Link to="/admin" onClick={() => setAccountMenuOpen(false)} className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 no-underline">
+                          Admin
+                        </Link>
+                      )}
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-50 dark:hover:bg-gray-700 border-t border-gray-100 dark:border-gray-700"
+                      >
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link to="/login" onClick={() => setAccountMenuOpen(false)} className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 no-underline">
+                        Login
+                      </Link>
+                      <Link to="/register" onClick={() => setAccountMenuOpen(false)} className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 no-underline">
+                        Register
+                      </Link>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Mobile icons + hamburger */}
